@@ -9,6 +9,13 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: RelWithDebInfo
+  # Based on https://github.com/oneapi-src/oneapi-ci/blob/master/.github/workflows/build_all.yml
+  WINDOWS_BASEKIT_URL: https://registrationcenter-download.intel.com/akdlm/irc_nas/17768/w_BaseKit_p_2021.2.0.2871.exe
+  WINDOWS_BASEKIT_FILE: basekit.exe
+  WINDOWS_BASEKIT_COMPONENTS: intel.oneapi.win.dpcpp-compiler
+  WINDOWS_HPCKIT_URL: https://registrationcenter-download.intel.com/akdlm/irc_nas/17762/w_HPCKit_p_2021.2.0.2901.exe
+  WINDOWS_HPCKIT_FILE: hpckit.exe
+  WINDOWS_HPCKIT_COMPONENTS: intel.oneapi.win.ifort-compiler
 
 jobs:
   build:
@@ -21,8 +28,26 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
-    - name: Check space before
+    - name: Report space before
       run: Get-PSDrive
+
+    - name: Cache oneAPI
+      id: cache-oneapi
+      uses: actions/cache@v2
+      with:
+        path: C:\Program Files (x86)\Intel\oneAPI
+        key: install-oneapi-w_BaseKit_p_2021.2.0.2871-w_HPCKit_p_2021.2.0.2901
+
+    - name: Install oneAPI
+      shell: cmd
+      if: steps.cache-oneapi.outputs.cache-hit != 'true'
+      run: |
+        curl -fSLo %WINDOWS_BASEKIT_FILE% %WINDOWS_BASEKIT_URL%
+        start /b /wait %WINDOWS_BASEKIT_FILE% -s -x -f basekit_extracted --log basekit_extracted.log
+        basekit_extracted\bootstrapper.exe -s --action install --components=%WINDOWS_BASEKIT_COMPONENTS% --eula=accept --continue-with-optional-error=yes -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=1 --log-dir=.
+        curl -fSLo %WINDOWS_HPCKIT_FILE% %WINDOWS_HPCKIT_URL%
+        start /b /wait %WINDOWS_HPCKIT_FILE% -s -x -f hpckit_extracted --log hpckit_extracted.log
+        hpckit_extracted\bootstrapper.exe -s --action install --components=%WINDOWS_HPCKIT_COMPONENTS% --eula=accept --continue-with-optional-error=yes -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=1 --log-dir=.
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -39,7 +64,5 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
       
-    - name: Check space after
+    - name: Report space after
       run: Get-PSDrive
-      
-      
