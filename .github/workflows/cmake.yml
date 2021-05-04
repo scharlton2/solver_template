@@ -29,14 +29,19 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: Report space before
-      run: Get-PSDrive
+      run: |
+        Get-PSDrive
+        Get-ChildItem -Path C: -Recurse > c-drive-before.txt
+        reg export HKLM hklm-before.reg
 
     - name: Cache oneAPI
       id: cache-oneapi
       uses: actions/cache@v2
       with:
-        path: C:\Program Files (x86)\Intel\oneAPI
-        key: install-oneapi-w_BaseKit_p_2021.2.0.2871-w_HPCKit_p_2021.2.0.2901
+        path: |
+          C:\Program Files (x86)\Intel\oneAPI
+          C:\Program Files (x86)\Common Files\intel
+        key: install-oneapi-w_BaseKit_p_2021.2.0.2871-intel.oneapi.win.dpcpp-compiler-w_HPCKit_p_2021.2.0.2901-intel.oneapi.win.ifort-compiler
 
     - name: Install oneAPI
       shell: cmd
@@ -69,4 +74,17 @@ jobs:
         ctest -C %BUILD_TYPE%
       
     - name: Report space after
-      run: Get-PSDrive
+      run: |
+        Get-PSDrive
+        Get-ChildItem -Path C: -Recurse > c-drive-after.txt
+        reg export HKLM hklm-after.reg
+
+      - name: Archive results
+        uses: actions/upload-artifact@v2
+        with:
+          name: before-and-after
+          path: |
+            c-drive-before.txt
+            c-drive-after.txt
+            hklm-before.reg
+            hklm-after.reg
