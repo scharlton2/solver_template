@@ -79,12 +79,12 @@ jobs:
         Get-ChildItem -Path C: -Recurse > c-drive-after.txt
         reg export HKLM hklm-after.reg
 
-      - name: Archive results
-        uses: actions/upload-artifact@v2
-        with:
-          name: before-and-after
-          path: |
-            c-drive-before.txt
-            c-drive-after.txt
-            hklm-before.reg
-            hklm-after.reg
+    - name: Archive results
+      uses: actions/upload-artifact@v2
+      with:
+        name: before-and-after
+        path: |
+          c-drive-before.txt
+          c-drive-after.txt
+          hklm-before.reg
+          hklm-after.reg
