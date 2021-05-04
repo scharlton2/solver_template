@@ -31,21 +31,21 @@ jobs:
     - name: Report space before
       run: |
         Get-PSDrive
-        Get-ChildItem -Path C: -Recurse > c-drive-before.txt
-        reg export HKLM hklm-before.reg
+        # Get-ChildItem -Path C: -Recurse > c-drive-before.txt
+        # reg export HKLM hklm-before.reg
 
-    - name: Cache oneAPI
-      id: cache-oneapi
-      uses: actions/cache@v2
-      with:
-        path: |
-          C:\Program Files (x86)\Intel\oneAPI
-          C:\Program Files (x86)\Common Files\intel
-        key: install-oneapi-w_BaseKit_p_2021.2.0.2871-intel.oneapi.win.dpcpp-compiler-w_HPCKit_p_2021.2.0.2901-intel.oneapi.win.ifort-compiler
+    # - name: Cache oneAPI
+    #   id: cache-oneapi
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: |
+    #       C:\Program Files (x86)\Intel\oneAPI
+    #       C:\Program Files (x86)\Common Files\intel
+    #     key: install-oneapi-w_BaseKit_p_2021.2.0.2871-intel.oneapi.win.dpcpp-compiler-w_HPCKit_p_2021.2.0.2901-intel.oneapi.win.ifort-compiler
 
     - name: Install oneAPI
       shell: cmd
-      if: steps.cache-oneapi.outputs.cache-hit != 'true'
+      # if: steps.cache-oneapi.outputs.cache-hit != 'true'
       run: |
         curl -fSLo %WINDOWS_BASEKIT_FILE% %WINDOWS_BASEKIT_URL%
         start /b /wait %WINDOWS_BASEKIT_FILE% -s -x -f basekit_extracted --log basekit_extracted.log
@@ -76,15 +76,15 @@ jobs:
     - name: Report space after
       run: |
         Get-PSDrive
-        Get-ChildItem -Path C: -Recurse > c-drive-after.txt
-        reg export HKLM hklm-after.reg
+        # Get-ChildItem -Path C: -Recurse > c-drive-after.txt
+        # reg export HKLM hklm-after.reg
 
-      - name: Archive results
-        uses: actions/upload-artifact@v2
-        with:
-          name: before-and-after
-          path: |
-            c-drive-before.txt
-            c-drive-after.txt
-            hklm-before.reg
-            hklm-after.reg
+    # - name: Archive results
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: before-and-after
+    #     path: |
+    #       c-drive-before.txt
+    #       c-drive-after.txt
+    #       hklm-before.reg
+    #       hklm-after.reg
