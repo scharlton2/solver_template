@@ -47,9 +47,9 @@ jobs:
       shell: cmd
       # if: steps.cache-oneapi.outputs.cache-hit != 'true'
       run: |
-        # curl -fSLo %WINDOWS_BASEKIT_FILE% %WINDOWS_BASEKIT_URL%
-        # start /b /wait %WINDOWS_BASEKIT_FILE% -s -x -f basekit_extracted --log basekit_extracted.log
-        # basekit_extracted\bootstrapper.exe -s --action install --components=%WINDOWS_BASEKIT_COMPONENTS% --eula=accept --continue-with-optional-error=yes -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=1 --log-dir=.
+        curl -fSLo %WINDOWS_BASEKIT_FILE% %WINDOWS_BASEKIT_URL%
+        start /b /wait %WINDOWS_BASEKIT_FILE% -s -x -f basekit_extracted --log basekit_extracted.log
+        basekit_extracted\bootstrapper.exe -s --action install --eula=accept --continue-with-optional-error=yes -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=1 --log-dir=.
         curl -fSLo %WINDOWS_HPCKIT_FILE% %WINDOWS_HPCKIT_URL%
         start /b /wait %WINDOWS_HPCKIT_FILE% -s -x -f hpckit_extracted --log hpckit_extracted.log
         hpckit_extracted\bootstrapper.exe -s --action install --components=%WINDOWS_HPCKIT_COMPONENTS% --eula=accept --continue-with-optional-error=yes -p=NEED_VS2017_INTEGRATION=0 -p=NEED_VS2019_INTEGRATION=1 --log-dir=.
